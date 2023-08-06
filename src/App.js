@@ -6,17 +6,16 @@ import "./App.css";
 function App() {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   async function fetchMoviesHandler() {
     setIsLoading(true);
+    setError(null);
     try {
       const response = await fetch("https://swapi.dev/api/films/");
 
       if (!response.ok) {
-        throw new Error(
-          "Ein Fehler ist beim Abrufen der Filme aufgetreten: " +
-            response.statusText
-        );
+        throw new Error("Ein Fehler ist beim Abrufen der Filme aufgetreten.");
       }
 
       const data = await response.json();
@@ -31,10 +30,10 @@ function App() {
       });
 
       setMovies(transformedMovies);
-      setIsLoading(false);
     } catch (error) {
-      console.error("Ein Fehler ist aufgetreten:", error);
+      setError(error.message);
     }
+    setIsLoading(false);
   }
 
   return (
@@ -46,6 +45,7 @@ function App() {
         {!isLoading && movies.length > 0 && <MoviesList movies={movies} />}
         {!isLoading && movies.length === 0 && <p>Found no movies.</p>}
         {isLoading && <p>Loading...</p>}
+        {!isLoading && error && <p>{error}</p>}
       </section>
     </React.Fragment>
   );
